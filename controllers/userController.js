@@ -51,8 +51,12 @@ function listar(req, res) {
 }
 
 function update(req, res) {
+   // return res.status(200).json({'message':'updae'});
     let id = req.query.id;
+    console.log("upldae luis",id);
+    
     const usuario = req.body.user;
+console.log(user);
 
     const protectedUser = {
         nombre: usuario.nombre,
@@ -76,7 +80,7 @@ function update(req, res) {
             return res.status(400).json({'error': error, 'message' :'No se pudo modificar el parámetro'});
         }
         if ( updateResp ) {
-            res.status(200).json({'message' :'usuario updateado', updateResp });
+            return res.status(200).json({'message' :'usuario updateado', updateResp });
         }
     });
 }
@@ -84,6 +88,7 @@ function update(req, res) {
 function updatePassword(req, res) {
     let id = req.query.id;
     const password = req.body.password;
+    
 
 
     bcrypt.hash(password, saltRounds, function(err, hash) {
@@ -91,7 +96,7 @@ function updatePassword(req, res) {
             return res.status(400).json({'error': 'no se ha podido enciptar'});
         }
         if ( hash ) {
-            user.updateOne({ _id: id}, {$set: {password: hash} }, function(error, updateResp){
+            user.findByIdAndUpdate( id, {$set: {password: hash} }, function(error, updateResp){
                 if( error ) {
                     return res.status(400).json({'error': error, 'message' :'No se pudo modificar el parámetro'});
                 }
@@ -106,6 +111,7 @@ function updatePassword(req, res) {
 function borrar(req, res) {
     const usuario = req.body.user;
     let id = req.query.id;
+
 
     user.find({_id: id}, function(error, findResp){
 
@@ -127,6 +133,21 @@ function borrar(req, res) {
                 res.status(200).json({'message' :'usuario borrado', deleteResp });
             }
         });
+    });
+}
+
+
+function getUser(req, res) {
+    let id = req.query.id;
+    user.findOne({ _id: id}, {password:0 }, function (error, respuesUser){
+        if(error){
+            return res.status(400).json({ 'error': error , message: 'No se pueden listar usuarios..'});
+        }
+        if( respuesUser ) {
+             return res.status(200).json({ 'message': 'lista de usuarios', 'usuario': respuesUser });
+        }else{
+            return res.status(400).json({ message: 'No se puede encontrar el usuario..', 'error': err });
+        }
     });
 }
 
@@ -172,5 +193,6 @@ module.exports = {
     update,
     borrar,
     crear,
-    updatePassword
+    updatePassword,
+    getUser
 }

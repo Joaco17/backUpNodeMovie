@@ -13,4 +13,3 @@ api.use('/movies', movieRoutes);
 }); */
 
 module.exports = api;
-  //comentario
